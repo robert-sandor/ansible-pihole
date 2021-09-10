@@ -1,0 +1,6 @@
+roles:
+  - geerlingguy.docker
+  - geerlingguy.pip
+
+collections:
+  - community.docker
