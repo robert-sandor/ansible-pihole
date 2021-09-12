@@ -5,19 +5,9 @@
   
   gather_facts: yes
 
-  vars:
-    pihole_admin_password: changeme
-    pihole_path: "/home/{{ansible_user}}/pihole"
-    pihole_dns_list:
-      - 1.1.1.2
-      - 1.0.0.2
-
-    docker_compose_version: 1.29.2
-    docker_users: "{{ ansible_user }}"
-
-    pip_install_packages:
-      - name: docker
-      - name: docker-compose
+  vars_files:
+    - ./vars.default.yml
+    - ./vars.yml
 
   roles:
     - name: geerlingguy.docker
@@ -26,72 +16,16 @@
       become: yes
 
   tasks:
-    - name: Create pihole install folder and subfolders
-      become: yes
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-        mode: '0755'
-      with_items:
-        - "{{ pihole_path }}"
-        - "{{ pihole_path }}/etc"
-        - "{{ pihole_path }}/etc/pihole"
-        - "{{ pihole_path }}/etc/dnsmasq.d"
-
-    - name: Template pihole compose file
-      ansible.builtin.template:
-        src: ./templates/docker-compose.yml.j2
-        dest: "{{ pihole_path }}/docker-compose.yml"
-        owner: "{{ ansible_user }}"
-        mode: '0755'
-
     - name: Reset connection to reload user changes
       ansible.builtin.meta: reset_connection
-    
-    - name: Create pihole stopped
-      community.docker.docker_compose:
-        project_name: pihole
-        project_src: "{{ pihole_path }}"
-        stopped: yes
-    
-    - name: Create /etc/systemd/resolved.conf.d
-      become: yes
-      ansible.builtin.file:
-        path: "/etc/systemd/resolved.conf.d"
-        state: directory
-        owner: root
-        group: root
-        mode: '0755'
 
-    - name: Disable SystemD Resolved DNS Stub Listener
-      become: yes
-      ansible.builtin.copy:
-        src: "./files/noresolved.conf"
-        dest: "/etc/systemd/resolved.conf.d/noresolved.conf"
-        owner: root
-        group: root
-        mode: '0644'
+    - name: Install pihole
+      ansible.builtin.import_tasks: ./tasks/install-pihole.yml
 
-    - name: Restart SystemD Resolved
-      become: yes
-      ansible.builtin.systemd:
-        name: systemd-resolved
-        state: restarted
+    - name: Install Portainer Agent
+      ansible.builtin.import_tasks: ./tasks/install-pagent.yml
+      when: install_portainer_agent
 
-    - name: Set nameserver to local
-      become: yes
-      ansible.builtin.copy:
-        src: "./files/resolv.conf"
-        dest: "/etc/resolv.conf"
-        owner: root
-        group: root
-        mode: '0644'
-        backup: yes
-
-    - name: Restart pihole
-      community.docker.docker_compose:
-        project_name: pihole
-        project_src: "{{ pihole_path }}"
-        restarted: yes
+    - name: Register Portainer Agent
+      ansible.builtin.import_tasks: ./tasks/register-pagent.yml
+      when: install_portainer_agent and auto_register_portainer_agent

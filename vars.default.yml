@@ -1,0 +1,20 @@
+docker_compose_version: 1.29.2
+docker_users: "{{ ansible_user }}"
+
+pip_install_packages:
+  - name: docker
+  - name: docker-compose
+
+pihole_admin_password: changeme
+pihole_path: "/home/{{ansible_user}}/pihole"
+pihole_dns_list:
+  - 1.1.1.2
+  - 1.0.0.2
+
+install_portainer_agent: yes
+portainer_path: "/home/{{ansible_user}}/portainer-agent"
+auto_register_portainer_agent: yes
+portainer_host: 192.168.1.100
+portainer_port: 9000
+portainer_user: admin
+portainer_pass: changeme

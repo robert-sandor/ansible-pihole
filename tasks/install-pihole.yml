@@ -1,0 +1,73 @@
+- name: Create pihole install folder and subfolders
+  become: yes
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+  with_items:
+    - "{{ pihole_path }}"
+    - "{{ pihole_path }}/etc"
+    - "{{ pihole_path }}/etc/pihole"
+    - "{{ pihole_path }}/etc/dnsmasq.d"
+
+- name: Template pihole compose file
+  ansible.builtin.template:
+    src: ./templates/pihole/docker-compose.yml.j2
+    dest: "{{ pihole_path }}/docker-compose.yml"
+    owner: "{{ ansible_user }}"
+    mode: '0755'
+
+- name: Create pihole stopped
+  community.docker.docker_compose:
+    project_name: pihole
+    project_src: "{{ pihole_path }}"
+    stopped: yes
+
+- name: Create /etc/systemd/resolved.conf.d
+  become: yes
+  ansible.builtin.file:
+    path: "/etc/systemd/resolved.conf.d"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Disable SystemD Resolved DNS Stub Listener
+  become: yes
+  ansible.builtin.copy:
+    src: "./files/pihole/noresolved.conf"
+    dest: "/etc/systemd/resolved.conf.d/noresolved.conf"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Restart SystemD Resolved
+  become: yes
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    state: restarted
+
+- name: Set nameserver to local
+  become: yes
+  ansible.builtin.copy:
+    src: "./files/pihole/resolv.conf"
+    dest: "/etc/resolv.conf"
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+
+- name: Restart pihole
+  community.docker.docker_compose:
+    project_name: pihole
+    project_src: "{{ pihole_path }}"
+    restarted: yes
+
+# have to wait for a while for pihole to start before continuing
+# this sleep ain't the best solution, but nothing else comes to mind atm
+# TODO - find out if we can wait for the container to be "healthy"
+- name: Wait for pihole to start
+  ansible.builtin.wait_for:
+    timeout: 120

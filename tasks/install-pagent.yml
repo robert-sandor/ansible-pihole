@@ -1,0 +1,21 @@
+- name: Create portainer-agent install folder and subfolders
+  become: yes
+  ansible.builtin.file:
+    path: "{{ portainer_path }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+
+- name: Template portainer-agent compose file
+  ansible.builtin.copy:
+    src: ./templates/portainer-agent/docker-compose.yml
+    dest: "{{ portainer_path }}/docker-compose.yml"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+
+- name: Create portainer-agent
+  community.docker.docker_compose:
+    project_name: pagent
+    project_src: "{{ portainer_path }}"

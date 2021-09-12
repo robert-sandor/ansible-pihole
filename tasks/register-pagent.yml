@@ -1,0 +1,30 @@
+- name: Authenticate with {{ portainer_user }} on {{ portainer_host }}:{{ portainer_port }}
+  ansible.builtin.uri:
+    url: "http://{{ portainer_host }}:{{ portainer_port }}/api/auth"
+    method: POST
+    body_format: json
+    body: 
+      username: "{{ portainer_user }}"
+      password: "{{ portainer_pass }}"
+    status_code: 200
+  register: portainer_login
+
+- name: debug
+  debug:
+    var: ansible_host
+
+- name: Register Portainer Agent
+  ansible.builtin.uri:
+    url: "http://{{ portainer_host }}:{{ portainer_port }}/api/endpoints"
+    method: POST
+    body_format: form-urlencoded
+    body: 
+      Name: "{{ ansible_facts.hostname }}"
+      EndpointCreationType: "2"
+      URL: "tcp://{{ ansible_host }}:9001"
+      TLS: "true"
+      TLSSkipVerify: "true"
+      TLSSkipClientVerify: "true"
+    headers:
+      Authorization: Bearer {{ portainer_login.json.jwt }}
+
