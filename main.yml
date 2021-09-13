@@ -19,6 +19,9 @@
     - name: Reset connection to reload user changes
       ansible.builtin.meta: reset_connection
 
+    - name: Create docker network
+      ansible.builtin.import_tasks: ./tasks/create-docker-network.yml
+
     - name: Install pihole
       ansible.builtin.import_tasks: ./tasks/install-pihole.yml
 

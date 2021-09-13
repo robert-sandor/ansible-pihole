@@ -17,6 +17,7 @@
     src: ./templates/pihole/docker-compose.yml.j2
     dest: "{{ pihole_path }}/docker-compose.yml"
     owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
     mode: '0755'
 
 - name: Create pihole stopped

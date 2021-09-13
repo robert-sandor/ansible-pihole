@@ -18,3 +18,5 @@ portainer_host: 192.168.1.100
 portainer_port: 9000
 portainer_user: admin
 portainer_pass: changeme
+
+docker_network_name: piholenet
