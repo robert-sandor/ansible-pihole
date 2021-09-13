@@ -1,0 +1,31 @@
+- name: Get pihole API key
+  community.docker.docker_container_exec:
+    container: pihole
+    command: /bin/bash -c "awk -F= -v key="WEBPASSWORD" '$1==key {print $2}' /etc/pihole/setupVars.conf"
+  register: pihole_api_key_result
+
+- name: Print pihole api key
+  debug:
+    var: pihole_api_key_result
+
+- name: Create pihole-exporter install folder
+  become: yes
+  ansible.builtin.file:
+    path: "{{ pihole_path }}/exporter"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+
+- name: Template pihole exporter compose file
+  ansible.builtin.template:
+    src: ./templates/pihole-exporter/docker-compose.yml.j2
+    dest: "{{ pihole_path }}/exporter/docker-compose.yml"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+
+- name: Create pihole exporter
+  community.docker.docker_compose:
+    project_name: pihole-exporter
+    project_src: "{{ pihole_path }}/exporter"

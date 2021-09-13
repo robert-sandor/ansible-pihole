@@ -11,6 +11,10 @@ pihole_dns_list:
   - 1.1.1.2
   - 1.0.0.2
 
+enable_pihole_prometheus_exporter: yes
+pihole_prometheus_exporter_port: "9617"
+pihole_prometheus_exporter_interval: "30s"
+
 install_portainer_agent: yes
 portainer_path: "/home/{{ansible_user}}/portainer-agent"
 auto_register_portainer_agent: yes

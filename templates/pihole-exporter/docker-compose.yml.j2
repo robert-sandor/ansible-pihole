@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  pihole:
+    container_name: pihole-exporter
+    hostname: {{ ansible_facts.hostname }}-pihole-exporter
+    image: ekofr/pihole-exporter:latest
+    ports:
+      - "{{ pihole_prometheus_exporter_port }}:{{ pihole_prometheus_exporter_port }}"
+    environment:
+      PIHOLE_HOSTNAME: {{ ansible_facts.hostname }}-pihole
+      PIHOLE_API_TOKEN: {{ pihole_api_key_result.stdout }}
+      INTERVAL: {{ pihole_prometheus_exporter_interval }}
+      PORT: {{ pihole_prometheus_exporter_port }}
+    restart: always
+
+networks:
+  default:
+    external:
+      name: {{ docker_network_name }}
