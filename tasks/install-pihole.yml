@@ -66,9 +66,10 @@
     project_src: "{{ pihole_path }}"
     restarted: yes
 
-# have to wait for a while for pihole to start before continuing
-# this sleep ain't the best solution, but nothing else comes to mind atm
-# TODO - find out if we can wait for the container to be "healthy"
-- name: Wait for pihole to start
-  ansible.builtin.wait_for:
-    timeout: 120
+- name: Wait for pihole to be healthy
+  community.docker.docker_container_info:
+    name: pihole
+  register: result
+  until: result.container.State.Health.Status == "healthy"
+  delay: 10
+  retries: 20
