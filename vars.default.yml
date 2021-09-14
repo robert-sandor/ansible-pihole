@@ -24,3 +24,5 @@ portainer_user: admin
 portainer_pass: changeme
 
 docker_network_name: piholenet
+
+node_exporter_path: "/home/{{ansible_user}}/node-exporter"

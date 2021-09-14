@@ -28,6 +28,9 @@
     - name: Install pihole exporter
       ansible.builtin.import_tasks: ./tasks/install-pihole-exporter.yml
 
+    - name: Install prometheus node exporter
+      ansible.builtin.import_tasks: ./tasks/install-node-exporter.yml
+
     - name: Install Portainer Agent
       ansible.builtin.import_tasks: ./tasks/install-pagent.yml
       when: install_portainer_agent

@@ -4,10 +4,6 @@
     command: /bin/bash -c "awk -F= -v key="WEBPASSWORD" '$1==key {print $2}' /etc/pihole/setupVars.conf"
   register: pihole_api_key_result
 
-- name: Print pihole api key
-  debug:
-    var: pihole_api_key_result
-
 - name: Create pihole-exporter install folder
   become: yes
   ansible.builtin.file:
