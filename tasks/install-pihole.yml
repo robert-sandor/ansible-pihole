@@ -18,7 +18,16 @@
     dest: "{{ pihole_path }}/docker-compose.yml"
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
-    mode: '0755'
+    mode: '0644'
+
+- name: Template local-routing configuration
+  ansible.builtin.template:
+    src: ./templates/pihole/10-local-domain.conf.j2
+    dest: "{{ pihole_path }}/etc/dnsmasq.d/10-local-domain.conf"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+  when: enable_local_domain_routing
 
 - name: Create pihole stopped
   community.docker.docker_compose:

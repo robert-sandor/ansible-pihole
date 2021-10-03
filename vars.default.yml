@@ -26,3 +26,8 @@ portainer_pass: changeme
 docker_network_name: piholenet
 
 node_exporter_path: "/home/{{ansible_user}}/node-exporter"
+
+enable_local_domain_routing: no
+local_domain_routing:
+  - hostname: example.home.arpa
+    ip: 127.0.0.1
