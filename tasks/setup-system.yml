@@ -1,0 +1,17 @@
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Update system
+  ansible.builtin.apt:
+    upgrade: dist
+
+- name: Update timezone to {{ timezone }}
+  ansible.builtin.timezone:
+    name: "{{ timezone }}"
+
+- name: Disable SystemD stub resolver
+  ansible.builtin.import_tasks: ./tasks/deactivate-systemd-stub-resolver.yml
+
+- name: Reboot host
+  ansible.builtin.reboot:

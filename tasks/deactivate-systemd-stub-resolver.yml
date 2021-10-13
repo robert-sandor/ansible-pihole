@@ -1,0 +1,29 @@
+- name: Create /etc/systemd/resolved.conf.d
+  ansible.builtin.file:
+    path: "/etc/systemd/resolved.conf.d"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Disable SystemD Resolved DNS Stub Listener
+  ansible.builtin.copy:
+    src: "./files/pihole/noresolved.conf"
+    dest: "/etc/systemd/resolved.conf.d/noresolved.conf"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Restart SystemD Resolved
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    state: restarted
+
+- name: Create symlink for /etc/resolv.conf
+  ansible.builtin.file:
+    src: "/run/systemd/resolve/resolv.conf"
+    dest: "/etc/resolv.conf"
+    owner: root
+    group: root
+    mode: '0644'
+    force: yes

@@ -1,0 +1,76 @@
+version: "3"
+
+services:
+
+  pihole:
+    container_name: pihole
+    hostname: pihole
+    image: pihole/pihole:{{ pihole_version }}
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80/tcp"
+    environment:
+      TZ: {{ timezone }}
+      ServerIP: {{ ansible_facts.default_ipv4.address }}
+      PIHOLE_DNS_: '{{ pihole_dns_list | join(';') }}'
+      AMDIN_EMAIL: "{{ pihole_admin_email }}"
+      DNSSEC: "{{ pihole_enable_dnssec | ternary('true', 'false') }}"
+      CUSTOM_CACHE_SIZE: {{ pihole_cache_size }}
+      WEBUIBOXEDLAYOUT: "{{ pihole_webui_boxed | ternary('boxed', 'traditional') }}"
+      WEBTHEME: "{{ pihole_webui_theme }}"
+      TEMPERATUREUNIT: "{{ pihole_temperature_unit }}"
+    volumes:
+      - '{{ pihole_dir }}/etc/pihole:/etc/pihole/'
+      - '{{ pihole_dir }}/etc/dnsmasq.d/:/etc/dnsmasq.d/'
+    cap_add:
+      - NET_ADMIN
+    dns:
+      - 127.0.0.1
+      - {{ pihole_dns_list[0] | default(1.1.1.1) }}
+    restart: {{ project_restart_policy }}
+
+{% if pihole_exporter_install %}
+  pihole_exporter:
+    container_name: pihole_exporter
+    hostname: pihole-exporter
+    image: ekofr/pihole-exporter:{{ pihole_exporter_version }}
+    ports:
+      - "{{ pihole_exporter_port }}:{{ pihole_exporter_port }}"
+    environment:
+      PIHOLE_HOSTNAME: pihole
+      INTERVAL: {{ pihole_exporter_interval }}
+      PORT: {{ pihole_exporter_port }}
+    restart: {{ project_restart_policy }}
+
+{% endif %}
+{% if pagent_install %}
+  pagent:
+    container_name: pagent
+    hostname: pagent
+    image: portainer/agent:{{ pagent_version }}
+    ports:
+      - "9001:9001/tcp"
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    restart: {{ project_restart_policy }}
+
+{% endif %}
+{% if node_exporter_install %}
+  node_exporter:
+    container_name: node_exporter
+    hostname: node_exporter
+    image: prom/node-exporter:latest
+    command:
+      - '--path.rootfs=/host'
+    network_mode: host
+    pid: host
+    volumes:
+      - '/:/host:ro,rslave'
+    restart: {{ project_restart_policy }}
+
+{% endif %}
+networks:
+  default:
+    external:
+      name: {{ project_network_name }}

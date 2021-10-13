@@ -9,32 +9,34 @@
     - ./vars.default.yml
     - ./vars.yml
 
+  pre_tasks:
+    - name: Setup System
+      become: yes
+      ansible.builtin.import_tasks: ./tasks/setup-system.yml
+
   roles:
     - name: geerlingguy.docker
       become: yes
+      vars:
+        docker_install_compose: false
+        docker_users: "{{ ansible_facts.user_id }}"
     - name: geerlingguy.pip
       become: yes
+      vars:
+        pip_install_packages:
+            - name: docker
+            - name: docker-compose
 
   tasks:
     - name: Reset connection to reload user changes
       ansible.builtin.meta: reset_connection
 
-    - name: Create docker network
-      ansible.builtin.import_tasks: ./tasks/create-docker-network.yml
+    - name: Setup project
+      ansible.builtin.import_tasks: ./tasks/project-setup.yml
 
-    - name: Install pihole
-      ansible.builtin.import_tasks: ./tasks/install-pihole.yml
-
-    - name: Install pihole exporter
-      ansible.builtin.import_tasks: ./tasks/install-pihole-exporter.yml
-
-    - name: Install prometheus node exporter
-      ansible.builtin.import_tasks: ./tasks/install-node-exporter.yml
-
-    - name: Install Portainer Agent
-      ansible.builtin.import_tasks: ./tasks/install-pagent.yml
-      when: install_portainer_agent
-
-    - name: Register Portainer Agent
-      ansible.builtin.import_tasks: ./tasks/register-pagent.yml
-      when: install_portainer_agent and auto_register_portainer_agent
+    - name: Configure pihole
+      ansible.builtin.import_tasks: ./tasks/configure-pihole.yml
+      
+    # - name: Register Portainer Agent
+    #   ansible.builtin.import_tasks: ./tasks/register-pagent.yml
+    #   when: install_portainer_agent and auto_register_portainer_agent

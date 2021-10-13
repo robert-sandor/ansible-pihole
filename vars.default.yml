@@ -1,33 +1,35 @@
-docker_compose_version: 1.29.2
-docker_users: "{{ ansible_user }}"
+timezone: Europe/Bucharest
 
-pip_install_packages:
-  - name: docker
-  - name: docker-compose
+project_network_name: piholenet
+project_dir: "~/pihole"
+config_dir: "{{ project_dir }}/config"
+project_restart_policy: unless-stopped
 
+pihole_dir: "{{ config_dir }}/pihole"
+pihole_version: latest
+pihole_admin_email: pihole@{{ ansible_hostname }}
 pihole_admin_password: changeme
-pihole_path: "/home/{{ansible_user}}/pihole"
-pihole_dns_list:
-  - 1.1.1.2
-  - 1.0.0.2
+pihole_temperature_unit: c
+pihole_enable_dnssec: yes
+pihole_cache_size: 50000
+pihole_dns_list: [ 1.1.1.2, 1.0.0.2 ]
+pihole_webui_boxed: false
+pihole_webui_theme: default-dark
 
-enable_pihole_prometheus_exporter: yes
-pihole_prometheus_exporter_port: "9617"
-pihole_prometheus_exporter_interval: "30s"
+pihole_sync_install: yes
+pihole_sync_interval_minutes: 15
 
-install_portainer_agent: yes
-portainer_path: "/home/{{ansible_user}}/portainer-agent"
-auto_register_portainer_agent: yes
-portainer_host: 192.168.1.100
-portainer_port: 9000
-portainer_user: admin
-portainer_pass: changeme
+pihole_exporter_install: yes
+pihole_exporter_version: latest
+pihole_exporter_port: 9617
+pihole_exporter_interval: "30s"
 
-docker_network_name: piholenet
+pagent_install: yes
+pagent_version: latest
+pagent_autoregister: no
+pagent_server_host: 192.168.1.100
+pagent_server_port: 9000
+pagent_server_user: admin
+pagent_server_pass: chageme
 
-node_exporter_path: "/home/{{ansible_user}}/node-exporter"
-
-enable_local_domain_routing: no
-local_domain_routing:
-  - hostname: example.home.arpa
-    ip: 127.0.0.1
+node_exporter_install: yes
