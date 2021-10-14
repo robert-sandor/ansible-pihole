@@ -15,8 +15,8 @@ DNSMAQ_DIR='{{ pihole_dir }}/etc/dnsmasq.d'
 RNSMAQ_DIR='{{ pihole_dir }}/etc/dnsmasq.d'
 FILE_OWNER='999:999'
 RILE_OWNER='999:999'
-DOCKER_CON='{{ pihole_name_secondary }}'
-ROCKER_CON='{{ pihole_name_main }}'
+DOCKER_CON='{{ hostvars['pihole-sec'].pihole_container_name }}'
+ROCKER_CON='{{ hostvars['pihole-main'].pihole_container_name }}'
 
 # Interaction Customization
 INCLUDE_CNAME='{{ gravity_sync_include_cname | ternary('true', 'false') }}'
