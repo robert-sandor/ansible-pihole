@@ -1,0 +1,25 @@
+# Primary Pi-hole host (in IP or DNS name)
+REMOTE_HOST='{{ hostvars['pihole-main'].ansible_facts.default_ipv4.address }}'
+
+# User account on primary with SUDO rights
+REMOTE_USER='{{ hostvars['pihole-main'].ansible_facts.user_id }}'
+
+# Installation Types
+PH_IN_TYPE='docker'
+RH_IN_TYPE='docker'
+
+# Pi-hole Folder/File Customization
+PIHOLE_DIR='{{ pihole_dir }}/etc/pihole'
+RIHOLE_DIR='{{ pihole_dir }}/etc/pihole'
+DNSMAQ_DIR='{{ pihole_dir }}/etc/dnsmasq.d'
+RNSMAQ_DIR='{{ pihole_dir }}/etc/dnsmasq.d'
+FILE_OWNER='999:999'
+RILE_OWNER='999:999'
+DOCKER_CON='{{ pihole_name_secondary }}'
+ROCKER_CON='{{ pihole_name_main }}'
+
+# Interaction Customization
+INCLUDE_CNAME='{{ gravity_sync_include_cname | ternary('true', 'false') }}'
+
+# SSH Customization
+SSH_PKIF='{{ gravity_sync_ssh_key_file }}'

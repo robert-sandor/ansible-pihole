@@ -1,6 +1,6 @@
 - name: Wait for pihole to be healthy
   community.docker.docker_container_info:
-    name: pihole
+    name: "{{ pihole_container_name }}"
   register: result
   until: result.container.State.Health.Status == "healthy"
   delay: 10
@@ -8,12 +8,12 @@
 
 - name: Change the pihole admin password
   community.docker.docker_container_exec:
-    container: pihole
+    container: "{{ pihole_container_name }}"
     command: "pihole -a -p {{ pihole_admin_password }}"
 
 - name: Get pihole API token
   community.docker.docker_container_exec:
-    container: pihole
+    container: "{{ pihole_container_name }}"
     command: /bin/bash -c "awk -F= -v key="WEBPASSWORD" '$1==key {print $2}' /etc/pihole/setupVars.conf"
   register: _result
 

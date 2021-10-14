@@ -6,6 +6,15 @@
   ansible.builtin.apt:
     upgrade: dist
 
+- name: Install required packages
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - git
+    - rsync
+    - sqlite3
+
 - name: Update timezone to {{ timezone }}
   ansible.builtin.timezone:
     name: "{{ timezone }}"

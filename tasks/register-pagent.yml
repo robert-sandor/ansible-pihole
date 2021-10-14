@@ -1,11 +1,11 @@
-- name: Authenticate with {{ portainer_user }} on {{ portainer_host }}:{{ portainer_port }}
+- name: Authenticate with {{ pagent_server_user }} on {{ pagent_server_host }}:{{ pagent_server_port }}
   ansible.builtin.uri:
-    url: "http://{{ portainer_host }}:{{ portainer_port }}/api/auth"
+    url: "http://{{ pagent_server_host }}:{{ pagent_server_port }}/api/auth"
     method: POST
     body_format: json
     body: 
-      username: "{{ portainer_user }}"
-      password: "{{ portainer_pass }}"
+      username: "{{ pagent_server_user }}"
+      password: "{{ pagent_server_pass }}"
     status_code: 200
   register: portainer_login
 
@@ -15,7 +15,7 @@
 
 - name: Register Portainer Agent
   ansible.builtin.uri:
-    url: "http://{{ portainer_host }}:{{ portainer_port }}/api/endpoints"
+    url: "http://{{ pagent_server_host }}:{{ pagent_server_port }}/api/endpoints"
     method: POST
     body_format: form-urlencoded
     body: 

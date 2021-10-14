@@ -13,17 +13,24 @@
     owner: root
     group: root
     mode: '0644'
+  register: _result
 
 - name: Restart SystemD Resolved
   ansible.builtin.systemd:
     name: systemd-resolved
     state: restarted
+  when: _result.changed
+
+- name: Remove existing symlink for /etc/resolv.conf
+  ansible.builtin.file:
+    path: "/etc/resolv.conf"
+    state: absent
 
 - name: Create symlink for /etc/resolv.conf
   ansible.builtin.file:
+    state: link
     src: "/run/systemd/resolve/resolv.conf"
     dest: "/etc/resolv.conf"
     owner: root
     group: root
     mode: '0644'
-    force: yes

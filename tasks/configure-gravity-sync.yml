@@ -1,0 +1,58 @@
+- name: Checkout gravity-sync
+  ansible.builtin.git:
+    repo: 'https://github.com/vmstan/gravity-sync.git'
+    dest: "{{ gravity_sync_dir }}"
+  when: inventory_hostname == 'pihole-sec'
+
+- name: Generate new SSH key pair for gravity-sync
+  community.crypto.openssh_keypair:
+    path: "{{ home_dir }}/{{ gravity_sync_ssh_key_file }}"
+    type: ed25519
+    owner: "{{ ansible_facts.user_id }}"
+    group: "{{ ansible_facts.user_id }}"
+    mode: '0600'
+  register: gravity_sync_sshkey
+  when: inventory_hostname == 'pihole-sec'
+
+- name: debug
+  debug:
+    var: hostvars['pihole-sec'].gravity_sync_sshkey.public_key
+  when: inventory_hostname == 'pihole-main'
+
+- name: Add generated ssh key as authorized in pihole-main
+  ansible.posix.authorized_key:
+    user: "{{ ansible_facts.user_id }}"
+    state: present
+    key: "{{ hostvars['pihole-sec'].gravity_sync_sshkey.public_key }}"
+  when: inventory_hostname == 'pihole-main'
+
+- name: Template gravity-sync 
+  ansible.builtin.template:
+    src: ./templates/gravity-sync.conf.j2
+    dest: "{{ project_dir }}/gravity-sync/settings/gravity-sync.conf"
+    owner: "{{ ansible_facts.user_id }}"
+    group: "{{ ansible_facts.user_id }}"
+    mode: '0644'
+  when: inventory_hostname == 'pihole-sec'
+
+- name: Remove sudo password for {{ ansible_facts.user_id }}
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/{{ ansible_facts.user_id }}-no-passwd"
+    content: '{{ ansible_facts.user_id }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+  become: yes
+  when: gravity_sync_automate
+
+- name: Run first gravity-sync
+  ansible.builtin.command:
+    chdir: "{{ gravity_sync_dir }}"
+    cmd: ./gravity-sync.sh smart
+  when: inventory_hostname == 'pihole-sec'
+
+- name: Automate gravity-sync
+  ansible.builtin.command:
+    chdir: "{{ gravity_sync_dir }}"
+    cmd: ./gravity-sync.sh automate
+    stdin: "{{ gravity_sync_automate_interval_mins }}"
+  when: gravity_sync_automate and inventory_hostname == 'pihole-sec'
+

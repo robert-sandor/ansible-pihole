@@ -3,8 +3,8 @@ version: "3"
 services:
 
   pihole:
-    container_name: pihole
-    hostname: pihole
+    container_name: {{ pihole_container_name }}
+    hostname: {{ pihole_container_name }}
     image: pihole/pihole:{{ pihole_version }}
     ports:
       - "53:53/tcp"
@@ -33,7 +33,7 @@ services:
 {% if pihole_exporter_install %}
   pihole_exporter:
     container_name: pihole_exporter
-    hostname: pihole-exporter
+    hostname: pihole_exporter
     image: ekofr/pihole-exporter:{{ pihole_exporter_version }}
     ports:
       - "{{ pihole_exporter_port }}:{{ pihole_exporter_port }}"

@@ -1,7 +1,8 @@
 timezone: Europe/Bucharest
 
 project_network_name: piholenet
-project_dir: "~/pihole"
+home_dir: "/home/{{ ansible_facts.user_id }}"
+project_dir: "{{ home_dir }}/pihole"
 config_dir: "{{ project_dir }}/config"
 project_restart_policy: unless-stopped
 
@@ -15,9 +16,6 @@ pihole_cache_size: 50000
 pihole_dns_list: [ 1.1.1.2, 1.0.0.2 ]
 pihole_webui_boxed: false
 pihole_webui_theme: default-dark
-
-pihole_sync_install: yes
-pihole_sync_interval_minutes: 15
 
 pihole_exporter_install: yes
 pihole_exporter_version: latest
@@ -33,3 +31,10 @@ pagent_server_user: admin
 pagent_server_pass: chageme
 
 node_exporter_install: yes
+
+gravity_sync_install: yes
+gravity_sync_dir: "{{ project_dir }}/gravity-sync"
+gravity_sync_ssh_key_file: ".ssh/gravity_sync_ssh_key"
+gravity_sync_include_cname: yes
+gravity_sync_automate: yes
+gravity_sync_automate_interval_mins: 15

@@ -36,7 +36,11 @@
 
     - name: Configure pihole
       ansible.builtin.import_tasks: ./tasks/configure-pihole.yml
+
+    - name: Install gravity-sync
+      ansible.builtin.import_tasks: ./tasks/configure-gravity-sync.yml
+      when: gravity_sync_install
       
-    # - name: Register Portainer Agent
-    #   ansible.builtin.import_tasks: ./tasks/register-pagent.yml
-    #   when: install_portainer_agent and auto_register_portainer_agent
+    - name: Register Portainer Agent
+      ansible.builtin.import_tasks: ./tasks/register-pagent.yml
+      when: pagent_install and pagent_autoregister
