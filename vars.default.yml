@@ -22,6 +22,12 @@ pihole_cache_size: 50000
 pihole_dns_list: [ '{{ project_network_assignments.unbound }}#5053' ]
 pihole_webui_boxed: false
 pihole_webui_theme: default-dark
+pihole_allowed_domains:
+  - s.youtube.com # this allows youtube to save history
+  - something.something
+pihole_blocked_domains:
+  - example.example
+  - a.a
 
 pihole_exporter_install: yes
 pihole_exporter_version: latest
