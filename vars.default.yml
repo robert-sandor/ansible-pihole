@@ -1,10 +1,16 @@
 timezone: Europe/Bucharest
 
-project_network_name: piholenet
 home_dir: "/home/{{ ansible_facts.user_id }}"
 project_dir: "{{ home_dir }}/pihole"
 config_dir: "{{ project_dir }}/config"
 project_restart_policy: unless-stopped
+project_network_name: piholenet
+project_network_subnet: 172.20.0.0/24
+project_network_assignments:
+  pihole: 172.20.0.2
+  unbound: 172.20.0.3
+  pihole_exporter: 172.20.0.4
+  pagent: 172.20.0.5
 
 pihole_dir: "{{ config_dir }}/pihole"
 pihole_version: latest
@@ -13,7 +19,7 @@ pihole_admin_password: changeme
 pihole_temperature_unit: c
 pihole_enable_dnssec: yes
 pihole_cache_size: 50000
-pihole_dns_list: [ 1.1.1.2, 1.0.0.2 ]
+pihole_dns_list: [ '{{ project_network_assignments.unbound }}#5053' ]
 pihole_webui_boxed: false
 pihole_webui_theme: default-dark
 
@@ -38,3 +44,5 @@ gravity_sync_ssh_key_file: ".ssh/gravity_sync_ssh_key"
 gravity_sync_include_cname: yes
 gravity_sync_automate: yes
 gravity_sync_automate_interval_mins: 15
+
+unbound_install: yes

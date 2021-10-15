@@ -6,6 +6,9 @@ services:
     container_name: {{ pihole_container_name }}
     hostname: {{ pihole_container_name }}
     image: pihole/pihole:{{ pihole_version }}
+    networks:
+      {{ project_network_name }}:
+        ipv4_address: {{ project_network_assignments.pihole }}
     ports:
       - "53:53/tcp"
       - "53:53/udp"
@@ -35,10 +38,13 @@ services:
     container_name: pihole_exporter
     hostname: pihole_exporter
     image: ekofr/pihole-exporter:{{ pihole_exporter_version }}
+    networks:
+      {{ project_network_name }}:
+        ipv4_address: {{ project_network_assignments.pihole_exporter }}
     ports:
       - "{{ pihole_exporter_port }}:{{ pihole_exporter_port }}"
     environment:
-      PIHOLE_HOSTNAME: pihole
+      PIHOLE_HOSTNAME: 172.20.0.2
       INTERVAL: {{ pihole_exporter_interval }}
       PORT: {{ pihole_exporter_port }}
     restart: {{ project_restart_policy }}
@@ -49,6 +55,9 @@ services:
     container_name: pagent
     hostname: pagent
     image: portainer/agent:{{ pagent_version }}
+    networks:
+      {{ project_network_name }}:
+        ipv4_address: {{ project_network_assignments.pagent }}
     ports:
       - "9001:9001/tcp"
     volumes:
@@ -70,7 +79,23 @@ services:
     restart: {{ project_restart_policy }}
 
 {% endif %}
+{% if unbound_install %}
+  unbound:
+    container_name: unbound
+    hostname: unbound
+    image: klutchell/unbound:latest
+    networks:
+      {{ project_network_name }}:
+        ipv4_address: {{ project_network_assignments.unbound }}
+    ports:
+      - '5053:5053/tcp'
+      - '5053:5053/udp'
+    restart: {{ project_restart_policy }}
+
+{% endif %}
 networks:
-  default:
-    external:
-      name: {{ project_network_name }}
+  {{ project_network_name }}:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: {{ project_network_subnet }}
