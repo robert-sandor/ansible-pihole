@@ -69,7 +69,7 @@ services:
   node_exporter:
     container_name: node_exporter
     hostname: node_exporter
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:{{ node_exporter_version }}
     command:
       - '--path.rootfs=/host'
     network_mode: host
@@ -83,7 +83,7 @@ services:
   unbound:
     container_name: unbound
     hostname: unbound
-    image: klutchell/unbound:latest
+    image: klutchell/unbound:{{ unbound_version }}
     networks:
       {{ project_network_name }}:
         ipv4_address: {{ project_network_assignments.unbound }}

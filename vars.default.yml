@@ -30,6 +30,7 @@ pihole_blocked_domains:
 
 pihole_exporter_install: yes
 pihole_exporter_version: latest
+pihole_exporter_version_arm: v0.0.11
 pihole_exporter_port: 9617
 pihole_exporter_interval: "30s"
 
@@ -42,6 +43,7 @@ pagent_server_user: admin
 pagent_server_pass: chageme
 
 node_exporter_install: yes
+node_exporter_version: latest
 
 gravity_sync_install: yes
 gravity_sync_dir: "{{ project_dir }}/gravity-sync"
@@ -51,3 +53,4 @@ gravity_sync_automate: yes
 gravity_sync_automate_interval_mins: 15
 
 unbound_install: yes
+unbound_version: latest
