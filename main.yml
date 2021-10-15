@@ -20,6 +20,16 @@
       vars:
         docker_install_compose: false
         docker_users: "{{ ansible_facts.user_id }}"
+      when: '"x86_64" in ansible_architecture'
+      
+    - name: geerlingguy.docker_arm
+      become: yes
+      vars:
+        docker_install_compose: false
+        docker_version_armv7: "5:20.10.9~3-0~raspbian-buster"
+        docker_users: "{{ ansible_facts.user_id }}"
+      when: '"arm" in ansible_architecture'
+
     - name: geerlingguy.pip
       become: yes
       vars:

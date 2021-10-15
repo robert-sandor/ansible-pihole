@@ -1,5 +1,6 @@
 roles:
   - geerlingguy.docker
+  - geerlingguy.docker_arm
   - geerlingguy.pip
 
 collections:

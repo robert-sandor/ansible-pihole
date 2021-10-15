@@ -30,9 +30,19 @@
 - name: Update timezone to {{ timezone }}
   ansible.builtin.timezone:
     name: "{{ timezone }}"
+  register: timezone_result
+
+- name: Get status of services
+  ansible.builtin.service_facts:
+
+- name: Check if systemd-resolved is enabled
+  ansible.builtin.set_fact:
+    resolved_running: "{{ ansible_facts.services['systemd-resolved.service'].status == 'enabled' }}"
 
 - name: Disable SystemD stub resolver
   ansible.builtin.import_tasks: ./tasks/deactivate-systemd-stub-resolver.yml
+  when: resolved_running
 
 - name: Reboot host
   ansible.builtin.reboot:
+  when: timezone_result.changed
