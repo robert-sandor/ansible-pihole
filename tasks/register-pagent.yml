@@ -9,10 +9,6 @@
     status_code: 200
   register: portainer_login
 
-- name: debug
-  debug:
-    var: ansible_host
-
 - name: Register Portainer Agent
   ansible.builtin.uri:
     url: "http://{{ pagent_server_host }}:{{ pagent_server_port }}/api/endpoints"

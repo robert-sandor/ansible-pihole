@@ -10,6 +10,7 @@
   community.docker.docker_container_exec:
     container: "{{ pihole_container_name }}"
     command: "pihole -a -p {{ pihole_admin_password }}"
+  when: pihole_admin_password
 
 - name: Add allowed domains to pihole
   community.docker.docker_container_exec:
