@@ -1,0 +1,3 @@
+{% for ld in pihole_local_domain_list %}
+address=/{{ ld.hostname }}/{{ ld.ip }}
+{% endfor %}

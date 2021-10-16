@@ -22,11 +22,13 @@ pihole_dns_list: [ '{{ project_network_assignments.unbound }}#5053' ]
 pihole_webui_boxed: false
 pihole_webui_theme: default-dark
 pihole_allowed_domains:
-  - s.youtube.com # this allows youtube to save history
   - something.something
 pihole_blocked_domains:
   - example.example
-  - a.a
+pihole_local_domain_routing: yes
+pihole_local_domain_list:
+  - hostname: example
+    ip: 127.0.0.1
 
 pihole_exporter_install: yes
 pihole_exporter_version: latest

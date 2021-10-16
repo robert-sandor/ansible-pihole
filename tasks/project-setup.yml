@@ -1,4 +1,5 @@
 - name: Create project folder structure
+  become: yes
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -6,9 +7,11 @@
     group: "{{ ansible_facts.user_id }}"
     mode: '0755'
   with_items:
-    - "{{ project_dir }}"
-    - "{{ config_dir }}"
-    - "{{ pihole_dir }}"
+    - "{{ project_dir | expanduser }}"
+    - "{{ config_dir | expanduser }}"
+    - "{{ pihole_dir | expanduser }}"
+    - "{{ pihole_dir | expanduser }}/etc"
+    - "{{ pihole_dir | expanduser }}/etc/dnsmasq.d"
 
 - name: Template pihole compose file
   ansible.builtin.template:
@@ -17,6 +20,13 @@
     owner: "{{ ansible_facts.user_id }}"
     group: "{{ ansible_facts.user_id }}"
     mode: '0644'
+
+- name: Template local-routing configuration
+  ansible.builtin.template:
+    src: ./templates/10-local-domain.conf.j2
+    dest: "{{ pihole_dir }}/etc/dnsmasq.d/10-local-domain.conf"
+    mode: '0644'
+  when: pihole_local_domain_routing
 
 - name: Start docker-compose services
   community.docker.docker_compose:

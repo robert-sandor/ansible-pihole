@@ -1,13 +1,13 @@
 # ansible-pihole
-Ansible playbook for deploying pihole in docker, along with helpers/metrics
-
+Ansible playbook for deploying pihole in docker, along with supporting services.
 This is work in progress.
 
 To install dependencies, run:
-`ansible-galaxy install -r requirements.yml && ansible-galaxy collection install -r requirements.yml`
+
+    ansible-galaxy install -r requirements.yml && ansible-galaxy collection install -r requirements.yml
 
 To run the playbook:
-1. Copy the `inventory.example` file to `invetory`, and modify it to reflect the hosts you want to install on. ([How to build your inventory - Asible Docs](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html))
+1. Copy the `inventory.yml.example` file to `inventory.yml`, and modify it to reflect the hosts you want to install on. ([How to build your inventory - Asible Docs](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html))
 2. Copy the `vars.default.yml` file to `vars.yml`, and change the variables to reflect your own setup preferences.
 3. Run `ansible-playbook main.yml -i inventory -K` to run the playbook.
 

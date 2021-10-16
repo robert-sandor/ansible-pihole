@@ -15,11 +15,13 @@
   community.docker.docker_container_exec:
     container: "{{ pihole_container_name }}"
     command: "pihole -w {{ pihole_allowed_domains | join(' ') }}"
+  when: pihole_allowed_domains
 
 - name: Add blocked domains to pihole
   community.docker.docker_container_exec:
     container: "{{ pihole_container_name }}"
     command: "pihole -b {{ pihole_blocked_domains | join(' ') }}"
+  when: pihole_blocked_domains
 
 - name: Get pihole API token
   community.docker.docker_container_exec:
