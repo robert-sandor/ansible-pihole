@@ -1,0 +1,20 @@
+---
+- name: Update local routing
+  
+  hosts: all
+  
+  vars_files:
+    - ./vars.default.yml
+    - ./vars.yml
+
+  tasks:
+    - name: Template local-routing configuration
+      ansible.builtin.template:
+        src: ./templates/10-local-domain.conf.j2
+        dest: "{{ pihole_dir }}/etc/dnsmasq.d/10-local-domain.conf"
+        mode: '0644'
+
+    - name: Restart pihole DNS
+      community.docker.docker_container_exec:
+        container: "{{ pihole_container_name }}"
+        command: "pihole restartdns"
