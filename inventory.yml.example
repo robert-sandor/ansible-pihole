@@ -3,6 +3,8 @@ all:
     pihole-main:
       ansible_host: 192.168.1.201
       pihole_container_name: pihole_main
+      domain: pihole.home.arpa
     pihole-sec:
       ansible_host: 192.168.1.202
       pihole_container_name: pihole_sec
+      domain: pihole2.home.arpa

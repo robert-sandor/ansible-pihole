@@ -48,3 +48,10 @@ gravity_sync_ssh_key_file: ".ssh/gravity_sync_ssh_key"
 gravity_sync_include_cname: yes
 gravity_sync_automate: yes
 gravity_sync_automate_interval_mins: 15
+
+traefik_install: yes
+acme_email: someone@email.invalid
+acme_provider: cloudflare
+acme_env:
+  CF_API_EMAIL: someone@email.invalid
+  CF_DNS_API_TOKEN: supersecretkey

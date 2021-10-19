@@ -11,7 +11,8 @@ services:
     ports:
       - "53:53/tcp"
       - "53:53/udp"
-      - "80:80/tcp"
+    expose:
+      - 80
     environment:
       TZ: {{ timezone }}
       ServerIP: {{ ansible_facts.default_ipv4.address }}
@@ -31,7 +32,57 @@ services:
       - 127.0.0.1
       - {{ pihole_dns_list[0] | default(1.1.1.1) }}
     restart: {{ project_restart_policy }}
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.{{ pihole_container_name }}.loadbalancer.server.port=80
+      - traefik.http.routers.{{ pihole_container_name }}.rule=Host(`{{ domain }}`)
+      - traefik.http.routers.{{ pihole_container_name }}.entrypoints=websecure
+      - traefik.http.routers.{{ pihole_container_name }}.service={{ pihole_container_name }}
+      - traefik.http.routers.{{ pihole_container_name }}.tls.certresolver={{ acme_provider }}
 
+{% if traefik_install %}
+  traefik:
+    container_name: traefik
+    hostname: traefik
+    image: traefik:latest
+    command:
+      - "--api=true"
+      - "--providers.docker=true"
+      - "--providers.docker.network={{ project_network_name }}"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.{{ acme_provider }}.acme.dnschallenge=true"
+      - "--certificatesresolvers.{{ acme_provider }}.acme.dnschallenge.provider={{ acme_provider }}"
+      - "--certificatesresolvers.{{ acme_provider }}.acme.email={{ acme_email }}"
+      - "--certificatesresolvers.{{ acme_provider }}.acme.storage=/letsencrypt/acme.json"
+    environment:
+      - PUID={{ ansible_facts.user_uid }}
+      - PGID={{ ansible_facts.user_gid }}
+      - TZ={{ timezone }}
+{% for e in acme_env %}
+      - {{ e }}={{ acme_env[e] }}
+{% endfor %}
+    networks:
+      - {{ project_network_name }}
+    ports:
+      - 80:80
+      - 443:443
+    expose:
+      - 8080
+    volumes:
+      - {{ project_dir }}/letsencrypt:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.rule=Host(`traefik.{{ domain }}`)
+      - traefik.http.routers.traefik.entrypoints=websecure
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.tls.certresolver={{ acme_provider }}
+    restart: {{ project_restart_policy }}
+
+{% endif %}
 {% if pihole_exporter_install %}
   pihole_exporter:
     container_name: pihole_exporter
