@@ -4,7 +4,6 @@ project_dir: "/home/{{ ansible_facts.user_id }}/pihole"
 config_dir: "{{ project_dir }}/config"
 project_restart_policy: unless-stopped
 project_network_name: piholenet
-project_network_subnet: 172.20.0.0/24
 
 pihole_dir: "{{ config_dir }}/pihole"
 pihole_version: latest
