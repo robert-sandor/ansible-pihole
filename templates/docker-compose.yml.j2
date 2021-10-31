@@ -129,7 +129,5 @@ services:
 {% endif %}
 networks:
   {{ project_network_name }}:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: {{ project_network_subnet }}
+    external:
+      name: {{ project_network_name }}
