@@ -7,11 +7,11 @@
     group: "{{ ansible_facts.user_id }}"
     mode: '0755'
   with_items:
-    - "{{ project_dir | expanduser }}"
-    - "{{ config_dir | expanduser }}"
-    - "{{ pihole_dir | expanduser }}"
-    - "{{ pihole_dir | expanduser }}/etc"
-    - "{{ pihole_dir | expanduser }}/etc/dnsmasq.d"
+    - "{{ project_dir }}"
+    - "{{ config_dir }}"
+    - "{{ pihole_dir }}"
+    - "{{ pihole_dir }}/etc"
+    - "{{ pihole_dir }}/etc/dnsmasq.d"
 
 - name: Template pihole compose file
   ansible.builtin.template:

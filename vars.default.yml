@@ -1,6 +1,6 @@
 timezone: Europe/Bucharest
 
-project_dir: "~/pihole"
+project_dir: "/home/{{ ansible_facts.user_id }}/pihole"
 config_dir: "{{ project_dir }}/config"
 project_restart_policy: unless-stopped
 project_network_name: piholenet
