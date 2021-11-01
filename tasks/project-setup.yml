@@ -28,6 +28,10 @@
     mode: '0644'
   when: pihole_local_domain_routing
 
+- name: Create docker volumes
+  community.docker.docker_volume:
+    name: "{{ acme_volume }}"
+
 - name: Create docker network {{ project_network_name }}
   community.docker.docker_network:
     name: "{{ project_network_name }}"

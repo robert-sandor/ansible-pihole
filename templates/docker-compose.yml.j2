@@ -72,7 +72,7 @@ services:
     expose:
       - 8080
     volumes:
-      - {{ project_dir }}/letsencrypt:/letsencrypt
+      - {{ acme_volume }}:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - traefik.enable=true
@@ -131,3 +131,7 @@ networks:
   {{ project_network_name }}:
     external:
       name: {{ project_network_name }}
+
+volumes:
+  {{ acme_volume }}:
+    external: true
