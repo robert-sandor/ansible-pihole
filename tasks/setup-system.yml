@@ -40,7 +40,7 @@
     resolved_running: "{{ ansible_facts.services['systemd-resolved.service'].status == 'enabled' }}"
 
 - name: Disable SystemD stub resolver
-  ansible.builtin.import_tasks: ./tasks/deactivate-systemd-stub-resolver.yml
+  ansible.builtin.import_tasks: ../tasks/deactivate-systemd-stub-resolver.yml
   when: resolved_running
 
 - name: Reboot host

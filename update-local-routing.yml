@@ -10,7 +10,7 @@
   tasks:
     - name: Template local-routing configuration
       ansible.builtin.template:
-        src: ./templates/10-local-domain.conf.j2
+        src: ../templates/10-local-domain.conf.j2
         dest: "{{ pihole_dir }}/etc/dnsmasq.d/10-local-domain.conf"
         mode: '0644'
 

@@ -36,7 +36,7 @@
 
 - name: Template .env file into the project
   ansible.builtin.template:
-    src: ./templates/.env.j2
+    src: ../templates/.env.j2
     dest: "{{ project_dir }}/.env"
     owner: "{{ ansible_facts.user_id }}"
     group: "{{ ansible_facts.user_id }}"

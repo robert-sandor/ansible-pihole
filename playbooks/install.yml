@@ -6,13 +6,13 @@
   gather_facts: yes
 
   vars_files:
-    - ./vars.default.yml
-    - ./vars.yml
+    - ../vars.default.yml
+    - ../vars.yml
 
   pre_tasks:
     - name: Setup System
       become: yes
-      ansible.builtin.import_tasks: ./tasks/setup-system.yml
+      ansible.builtin.import_tasks: ../tasks/setup-system.yml
 
   roles:
     - name: geerlingguy.docker
@@ -42,15 +42,15 @@
       ansible.builtin.meta: reset_connection
 
     - name: Setup project
-      ansible.builtin.import_tasks: ./tasks/project-setup.yml
+      ansible.builtin.import_tasks: ../tasks/project-setup.yml
 
     - name: Configure pihole
-      ansible.builtin.import_tasks: ./tasks/configure-pihole.yml
+      ansible.builtin.import_tasks: ../tasks/configure-pihole.yml
 
     - name: Install gravity-sync
-      ansible.builtin.import_tasks: ./tasks/configure-gravity-sync.yml
+      ansible.builtin.import_tasks: ../tasks/configure-gravity-sync.yml
       when: gravity_sync_install
       
     - name: Register Portainer Agent
-      ansible.builtin.import_tasks: ./tasks/register-pagent.yml
+      ansible.builtin.import_tasks: ../tasks/register-pagent.yml
       when: pagent_install and pagent_autoregister

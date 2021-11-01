@@ -23,7 +23,7 @@
 
 - name: Template gravity-sync 
   ansible.builtin.template:
-    src: ./templates/gravity-sync.conf.j2
+    src: ../templates/gravity-sync.conf.j2
     dest: "{{ project_dir }}/gravity-sync/settings/gravity-sync.conf"
     owner: "{{ ansible_facts.user_id }}"
     group: "{{ ansible_facts.user_id }}"

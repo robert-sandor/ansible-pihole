@@ -8,7 +8,7 @@
 
 - name: Disable SystemD Resolved DNS Stub Listener
   ansible.builtin.copy:
-    src: "./files/pihole/noresolved.conf"
+    src: "../files/pihole/noresolved.conf"
     dest: "/etc/systemd/resolved.conf.d/noresolved.conf"
     owner: root
     group: root

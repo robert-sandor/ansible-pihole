@@ -15,7 +15,7 @@
 
 - name: Template pihole compose file
   ansible.builtin.template:
-    src: ./templates/docker-compose.yml.j2
+    src: ../templates/docker-compose.yml.j2
     dest: "{{ project_dir }}/docker-compose.yml"
     owner: "{{ ansible_facts.user_id }}"
     group: "{{ ansible_facts.user_id }}"
@@ -23,7 +23,7 @@
 
 - name: Template local-routing configuration
   ansible.builtin.template:
-    src: ./templates/10-local-domain.conf.j2
+    src: ../templates/10-local-domain.conf.j2
     dest: "{{ pihole_dir }}/etc/dnsmasq.d/10-local-domain.conf"
     mode: '0644'
   when: pihole_local_domain_routing
