@@ -1,18 +1,6 @@
-- name: Update apt cache
-  ansible.builtin.apt:
-    update_cache: yes
-  register: _result
-  until: not _result.failed
-  delay: 10
-  retries: 10
-
 - name: Update system
-  ansible.builtin.apt:
-    upgrade: dist
-  register: _result
-  until: not _result.failed
-  delay: 10
-  retries: 10
+  ansible.builtin.import_tasks: ../tasks/update-system.yml
+  when: update_system
 
 - name: Install required packages
   ansible.builtin.apt:

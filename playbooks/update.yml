@@ -1,0 +1,25 @@
+---
+- name: Update PiHole on Docker with optional metrics and portainer agent
+  
+  hosts: all
+  serial: 1
+  
+  gather_facts: yes
+
+  vars_files:
+    - ../vars.default.yml
+    - ../vars.yml
+
+  tasks:
+    - name: Update system
+      ansible.builtin.import_tasks: ../tasks/update-system.yml
+      become: yes
+      when: update_system
+
+    - name: Update project
+      ansible.builtin.import_tasks: ../tasks/project-update.yml
+      when: update_containers
+
+    - name: Configure pihole
+      ansible.builtin.import_tasks: ../tasks/configure-pihole.yml
+      when: update_pihole

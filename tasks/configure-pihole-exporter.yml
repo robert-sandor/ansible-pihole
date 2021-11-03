@@ -1,0 +1,30 @@
+- name: Wait for pihole to be healthy
+  community.docker.docker_container_info:
+    name: "{{ pihole_container_name }}"
+  register: result
+  until: result.container.State.Health.Status == "healthy"
+  delay: 10
+  retries: 20
+
+- name: Get pihole API token
+  community.docker.docker_container_exec:
+    container: "{{ pihole_container_name }}"
+    command: /bin/bash -c "awk -F= -v key="WEBPASSWORD" '$1==key {print $2}' /etc/pihole/setupVars.conf"
+  register: _result
+
+- name: Save pihole API token
+  ansible.builtin.set_fact:
+    pihole_api_token: "{{ _result.stdout }}"
+
+- name: Template .env file into the project
+  ansible.builtin.template:
+    src: ../templates/.env.j2
+    dest: "{{ project_dir }}/.env"
+    owner: "{{ ansible_facts.user_id }}"
+    group: "{{ ansible_facts.user_id }}"
+    mode: '0644'
+
+- name: Restart pihole-exporter
+  community.docker.docker_compose:
+    project_name: pihole
+    project_src: "{{ project_dir }}"

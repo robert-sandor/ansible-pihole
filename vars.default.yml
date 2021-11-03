@@ -5,6 +5,10 @@ config_dir: "{{ project_dir }}/config"
 project_restart_policy: unless-stopped
 project_network_name: piholenet
 
+update_system: yes
+update_containers: yes
+update_pihole: yes
+
 pihole_dir: "{{ config_dir }}/pihole"
 pihole_version: latest
 pihole_admin_email: pihole@{{ ansible_hostname }}

@@ -10,39 +10,21 @@
   community.docker.docker_container_exec:
     container: "{{ pihole_container_name }}"
     command: "pihole -a -p {{ pihole_admin_password }}"
-  when: pihole_admin_password
+  when: pihole_admin_password | bool
 
 - name: Add allowed domains to pihole
   community.docker.docker_container_exec:
     container: "{{ pihole_container_name }}"
     command: "pihole -w {{ pihole_allowed_domains | join(' ') }}"
-  when: pihole_allowed_domains
+  when: pihole_allowed_domains | bool
 
 - name: Add blocked domains to pihole
   community.docker.docker_container_exec:
     container: "{{ pihole_container_name }}"
     command: "pihole -b {{ pihole_blocked_domains | join(' ') }}"
-  when: pihole_blocked_domains
+  when: pihole_blocked_domains | bool
 
-- name: Get pihole API token
+- name: Restart pihole DNS
   community.docker.docker_container_exec:
     container: "{{ pihole_container_name }}"
-    command: /bin/bash -c "awk -F= -v key="WEBPASSWORD" '$1==key {print $2}' /etc/pihole/setupVars.conf"
-  register: _result
-
-- name: Save pihole API token
-  ansible.builtin.set_fact:
-    pihole_api_token: "{{ _result.stdout }}"
-
-- name: Template .env file into the project
-  ansible.builtin.template:
-    src: ../templates/.env.j2
-    dest: "{{ project_dir }}/.env"
-    owner: "{{ ansible_facts.user_id }}"
-    group: "{{ ansible_facts.user_id }}"
-    mode: '0644'
-
-- name: Restart pihole-exporter
-  community.docker.docker_compose:
-    project_name: pihole
-    project_src: "{{ project_dir }}"
+    command: "pihole restartdns"
