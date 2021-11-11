@@ -1,4 +1,4 @@
-timezone: Europe/Bucharest
+timezone: Etc/Utc
 
 project_dir: "/home/{{ ansible_facts.user_id }}/pihole"
 config_dir: "{{ project_dir }}/config"
@@ -36,11 +36,6 @@ pihole_exporter_interval: "30s"
 
 pagent_install: yes
 pagent_version: latest
-pagent_autoregister: no
-pagent_server_host: 192.168.1.100
-pagent_server_port: 9000
-pagent_server_user: admin
-pagent_server_pass: chageme
 
 node_exporter_install: yes
 node_exporter_version: latest

@@ -10,19 +10,19 @@
   community.docker.docker_container_exec:
     container: "{{ pihole_container_name }}"
     command: "pihole -a -p {{ pihole_admin_password }}"
-  when: pihole_admin_password | bool
+  when: pihole_admin_password
 
 - name: Add allowed domains to pihole
   community.docker.docker_container_exec:
     container: "{{ pihole_container_name }}"
     command: "pihole -w {{ pihole_allowed_domains | join(' ') }}"
-  when: pihole_allowed_domains | bool
+  when: pihole_allowed_domains
 
 - name: Add blocked domains to pihole
   community.docker.docker_container_exec:
     container: "{{ pihole_container_name }}"
     command: "pihole -b {{ pihole_blocked_domains | join(' ') }}"
-  when: pihole_blocked_domains | bool
+  when: pihole_blocked_domains
 
 - name: Restart pihole DNS
   community.docker.docker_container_exec:

@@ -53,7 +53,3 @@
     - name: Install gravity-sync
       ansible.builtin.import_tasks: ../tasks/configure-gravity-sync.yml
       when: gravity_sync_install
-      
-    - name: Register Portainer Agent
-      ansible.builtin.import_tasks: ../tasks/register-pagent.yml
-      when: pagent_install and pagent_autoregister
