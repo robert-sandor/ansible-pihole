@@ -7,7 +7,7 @@ services:
     hostname: {{ pihole_container_name }}
     image: pihole/pihole:{{ pihole_version }}
     networks:
-      - {{ project_network_name }}
+      - {{ network_name }}
     ports:
       - "53:53/tcp"
       - "53:53/udp"
@@ -31,7 +31,7 @@ services:
     dns:
       - 127.0.0.1
       - {{ pihole_dns_list[0] | default(1.1.1.1) }}
-    restart: {{ project_restart_policy }}
+    restart: {{ restart_policy }}
     labels:
       - traefik.enable=true
       - traefik.http.services.{{ pihole_container_name }}.loadbalancer.server.port=80
@@ -40,15 +40,16 @@ services:
       - traefik.http.routers.{{ pihole_container_name }}.service={{ pihole_container_name }}
       - traefik.http.routers.{{ pihole_container_name }}.tls.certresolver={{ acme_provider }}
 
-{% if traefik_install %}
-  traefik:
-    container_name: traefik
-    hostname: traefik
-    image: traefik:latest
+{% if traefik_enable %}
+  {{ traefik_name }}:
+    container_name: {{ traefik_name }}
+    hostname: {{ traefik_name }}
+    image: traefik:{{ traefik_version }}
     command:
       - "--api=true"
+      - "--accesslog={{ traefik_enable_access_logs | ternary('true', 'false') }}"
       - "--providers.docker=true"
-      - "--providers.docker.network={{ project_network_name }}"
+      - "--providers.docker.network={{ network_name }}"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
@@ -57,6 +58,8 @@ services:
       - "--certificatesresolvers.{{ acme_provider }}.acme.dnschallenge.provider={{ acme_provider }}"
       - "--certificatesresolvers.{{ acme_provider }}.acme.email={{ acme_email }}"
       - "--certificatesresolvers.{{ acme_provider }}.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.{{ acme_provider }}.acme.caserver=https://acme{% if acme_testing_mode %}-staging{% endif %}-v02.api.letsencrypt.org/directory"
+      - "--metrics.prometheus={{ traefik_enable_metrics | ternary('true', 'false') }}"
     environment:
       - PUID={{ ansible_facts.user_uid }}
       - PGID={{ ansible_facts.user_gid }}
@@ -65,22 +68,35 @@ services:
       - {{ e }}={{ acme_env[e] }}
 {% endfor %}
     networks:
-      - {{ project_network_name }}
+      - {{ network_name }}
     ports:
       - 80:80
       - 443:443
     expose:
       - 8080
+{% if traefik_enable_metrics %}
+      - {{ traefik_metrics_port }}
+{% endif %}
     volumes:
       - {{ acme_volume }}:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - traefik.enable=true
-      - traefik.http.routers.traefik.rule=Host(`traefik.{{ domain }}`)
+      - traefik.http.routers.traefik.rule=Host(`{{ traefik_name }}.{{ domain }}`)
       - traefik.http.routers.traefik.entrypoints=websecure
       - traefik.http.routers.traefik.service=api@internal
       - traefik.http.routers.traefik.tls.certresolver={{ acme_provider }}
-    restart: {{ project_restart_policy }}
+{% if traefik_enable_metrics %}
+      - traefik.http.routers.metrics.rule=Host(`{{ traefik_name }}.{{ domain }}`) && Path(`/metrics`)
+      - traefik.http.routers.metrics.entrypoints=websecure
+      - traefik.http.routers.metrics.service=prometheus@internal
+      - traefik.http.routers.metrics.tls.certresolver={{ acme_provider }}
+{% endif %}
+      - flame.type=application
+      - flame.name={{ traefik_name }}
+      - flame.url={{ traefik_name }}.{{ domain }}
+      - flame.icon=traffic-light
+    restart: {{ restart_policy }}
 
 {% endif %}
 {% if pihole_exporter_install %}
@@ -89,14 +105,14 @@ services:
     hostname: pihole_exporter
     image: ekofr/pihole-exporter:{{ pihole_exporter_version }}
     networks:
-      - {{ project_network_name }}
+      - {{ network_name }}
     ports:
       - "{{ pihole_exporter_port }}:{{ pihole_exporter_port }}"
     environment:
       PIHOLE_HOSTNAME: 172.20.0.2
       INTERVAL: {{ pihole_exporter_interval }}
       PORT: {{ pihole_exporter_port }}
-    restart: {{ project_restart_policy }}
+    restart: {{ restart_policy }}
 
 {% endif %}
 {% if pagent_install %}
@@ -105,12 +121,12 @@ services:
     hostname: pagent
     image: portainer/agent:{{ pagent_version }}
     networks:
-      - {{ project_network_name }}
+      - {{ network_name }}
     ports:
       - "9001:9001/tcp"
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
-    restart: {{ project_restart_policy }}
+    restart: {{ restart_policy }}
 
 {% endif %}
 {% if node_exporter_install %}
@@ -124,13 +140,13 @@ services:
     pid: host
     volumes:
       - '/:/host:ro,rslave'
-    restart: {{ project_restart_policy }}
+    restart: {{ restart_policy }}
 
 {% endif %}
 networks:
-  {{ project_network_name }}:
+  {{ network_name }}:
     external:
-      name: {{ project_network_name }}
+      name: {{ network_name }}
 
 volumes:
   {{ acme_volume }}:
