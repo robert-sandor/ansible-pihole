@@ -143,6 +143,30 @@ services:
     restart: {{ restart_policy }}
 
 {% endif %}
+{% if wt_enable %}
+  {{ wt_name }}:
+    container_name: {{ wt_name }}
+    hostname: {{ wt_name }}
+    image: {{ wt_image }}:{{ wt_version }}
+    restart: {{ restart_policy }}
+    command:
+      - "--schedule={{ wt_cron_schedule }}"
+{% if wt_monitor_only %}
+      - "--monitor-only"
+{% endif %}
+{% if wt_discord_enable %}
+      - "--notifications=slack"
+      - "--notification-slack-hook-url={{ wt_discord_hook_url }}"
+      - "--notification-slack-identifier={{ wt_discord_indentifier }}"
+{% endif %}
+    environment:
+      - TZ={{ timezone }}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - {{ network_name }}
+    
+{% endif %}
 networks:
   {{ network_name }}:
     external:

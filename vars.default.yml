@@ -64,3 +64,14 @@ validate_certificates: "{{ not acme_testing_mode }}"
 acme_env:
   CF_API_EMAIL: someone@email.invalid
   CF_DNS_API_TOKEN: supersecretkey
+
+# watchtower - to monitor for updated docker images
+wt_enable: yes
+wt_name: watchtower
+wt_version: latest
+wt_image: containrrr/watchtower
+wt_cron_schedule: "0 0 1 * * *"
+wt_discord_enable: no
+wt_discord_hook_url: https://discord.com/api/webhooks/.../.../slack
+wt_discord_indentifier: watchtower-{{ pihole_container_name }}
+wt_monitor_only: yes
