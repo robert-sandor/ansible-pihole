@@ -13,6 +13,7 @@ pihole_dir: "{{ config_dir }}/pihole"
 pihole_version: latest
 pihole_admin_email: pihole@{{ ansible_hostname }}
 pihole_admin_password: changeme
+pihole_autoupdate: no
 pihole_temperature_unit: c
 pihole_enable_dnssec: yes
 pihole_cache_size: 50000
@@ -33,12 +34,15 @@ pihole_exporter_version: latest
 pihole_exporter_version_arm: v0.0.11
 pihole_exporter_port: 9617
 pihole_exporter_interval: "30s"
+pihole_exporter_autoupdate: no
 
 pagent_install: yes
 pagent_version: latest
+pagent_autoupdate: no
 
 node_exporter_install: yes
 node_exporter_version: latest
+node_exporter_autoupdate: no
 
 gravity_sync_install: yes
 gravity_sync_dir: "{{ project_dir }}/gravity-sync"
@@ -55,6 +59,7 @@ traefik_image: traefik
 traefik_enable_metrics: yes
 traefik_enable_access_logs: yes
 traefik_metrics_port: 8081
+traefik_autoupdate: no
 
 acme_email: someone@email.invalid
 acme_provider: cloudflare
@@ -72,6 +77,9 @@ wt_version: latest
 wt_image: containrrr/watchtower
 wt_cron_schedule: "0 0 1 * * *"
 wt_discord_enable: no
+wt_discord_skip_startup_message: no
 wt_discord_hook_url: https://discord.com/api/webhooks/.../.../slack
 wt_discord_indentifier: watchtower-{{ pihole_container_name }}
-wt_monitor_only: yes
+wt_monitor_only: no
+wt_update_label_only: yes
+wt_autoupdate: no

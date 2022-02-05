@@ -39,6 +39,7 @@ services:
       - traefik.http.routers.{{ pihole_container_name }}.entrypoints=websecure
       - traefik.http.routers.{{ pihole_container_name }}.service={{ pihole_container_name }}
       - traefik.http.routers.{{ pihole_container_name }}.tls.certresolver={{ acme_provider }}
+      - com.centurylinklabs.watchtower.enable={{ pihole_autoupdate | ternary('true', 'false')}}
 
 {% if traefik_enable %}
   {{ traefik_name }}:
@@ -92,10 +93,7 @@ services:
       - traefik.http.routers.metrics.service=prometheus@internal
       - traefik.http.routers.metrics.tls.certresolver={{ acme_provider }}
 {% endif %}
-      - flame.type=application
-      - flame.name={{ traefik_name }}
-      - flame.url={{ traefik_name }}.{{ domain }}
-      - flame.icon=traffic-light
+      - com.centurylinklabs.watchtower.enable={{ traefik_autoupdate | ternary('true', 'false')}}
     restart: {{ restart_policy }}
 
 {% endif %}
@@ -113,6 +111,8 @@ services:
       INTERVAL: {{ pihole_exporter_interval }}
       PORT: {{ pihole_exporter_port }}
     restart: {{ restart_policy }}
+    labels:
+      - com.centurylinklabs.watchtower.enable={{ pihole_exporter_autoupdate | ternary('true', 'false')}}
 
 {% endif %}
 {% if pagent_install %}
@@ -127,6 +127,8 @@ services:
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
     restart: {{ restart_policy }}
+    labels:
+      - com.centurylinklabs.watchtower.enable={{ pagent_autoupdate | ternary('true', 'false')}}
 
 {% endif %}
 {% if node_exporter_install %}
@@ -141,6 +143,8 @@ services:
     volumes:
       - '/:/host:ro,rslave'
     restart: {{ restart_policy }}
+    labels:
+      - com.centurylinklabs.watchtower.enable={{ node_exporter_autoupdate | ternary('true', 'false')}}
 
 {% endif %}
 {% if wt_enable %}
@@ -154,6 +158,12 @@ services:
 {% if wt_monitor_only %}
       - "--monitor-only"
 {% endif %}
+{% if wt_update_label_only %}
+      - "--label-enable"
+{% endif %}
+{% if wt_discord_skip_startup_message %}
+      - "--no-startup-message"
+{% endif %}
 {% if wt_discord_enable %}
       - "--notifications=slack"
       - "--notification-slack-hook-url={{ wt_discord_hook_url }}"
@@ -165,6 +175,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - {{ network_name }}
+    labels:
+      - com.centurylinklabs.watchtower.enable={{ wt_autoupdate | ternary('true', 'false')}}
     
 {% endif %}
 networks:
