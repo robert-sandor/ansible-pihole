@@ -28,7 +28,7 @@
         docker_install_compose: false
         docker_version_armv7: "5:20.10.9~3-0~raspbian-buster"
         docker_users: "{{ ansible_facts.user_id }}"
-      when: '"arm" in ansible_architecture'
+      when: '"arm" in ansible_architecture or "aarch64" in ansible_architecture'
 
     - name: geerlingguy.pip
       become: yes
